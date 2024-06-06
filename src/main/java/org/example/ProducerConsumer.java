@@ -11,29 +11,29 @@ public class ProducerConsumer {
 
     public static void main(String[] args) {
         BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
-        Thread[] producer = new Thread[PRODUCER_COUNT];
-        Thread[] consumer = new Thread[CONSUMER_COUNT];
+        Thread[] producers = new Thread[PRODUCER_COUNT];
+        Thread[] consumers = new Thread[CONSUMER_COUNT];
 
         for (int i = 0; i < PRODUCER_COUNT; i++) {
-            producer[i] = new Thread(new Producer());
-            producer[i].start();
+            producers[i] = new Thread(new Producer(queue));
+            producers[i].start();
         }
 
         for (int i = 0; i < CONSUMER_COUNT; i++) {
-            consumer[i] = new Thread(new Consumer());
-            consumer[i].start();
+            consumers[i] = new Thread(new Consumer(queue));
+            consumers[i].start();
         }
 
-        for (Thread producers : producer) {
+        for (Thread producer : producers) {
             try {
-                producers.join();
-            }catch(Exception e) {
+                producer.join();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        for (Thread consumers : consumer) {
-           consumers.interrupt();
+        for (Thread consumer : consumers) {
+            consumer.interrupt();
         }
     }
 
@@ -46,11 +46,11 @@ public class ProducerConsumer {
 
         @Override
         public void run() {
-            for (int i = 0; i < PRODUCER_COUNT; i++) {
+            for (int i = 0; i < PRODUCE_COUNT; i++) {
                 try {
-                    int item = queue.poll();
+                    int item = (int) (Math.random() * 100);
                     queue.put(item);
-                    System.out.println("El Producer produjo:"+ item);
+                    System.out.println("El Productor hizo el: " + item);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -61,16 +61,17 @@ public class ProducerConsumer {
     static class Consumer implements Runnable {
         private final BlockingQueue<Integer> queue;
 
-        public Consumer (BlockingQueue<Integer> queue) {
+        public Consumer(BlockingQueue<Integer> queue) {
             this.queue = queue;
         }
+
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-                try{
+                try {
                     int item = queue.take();
-                    System.out.println("El Consumidor consumió: "+ item);
-                } catch(InterruptedException e) {
+                    System.out.println("El Consumidor consumió el: " + item);
+                } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
