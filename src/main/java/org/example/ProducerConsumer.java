@@ -11,29 +11,29 @@ public class ProducerConsumer {
 
     public static void main(String[] args) {
         BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
-        Thread[] producers = new Thread[PRODUCER_COUNT];
-        Thread[] consumers = new Thread[CONSUMER_COUNT];
+        Thread[] producer = new Thread[PRODUCER_COUNT];
+        Thread[] consumer = new Thread[CONSUMER_COUNT];
 
         for (int i = 0; i < PRODUCER_COUNT; i++) {
-            producers[i] = new Thread(new Producer(queue));
-            producers[i].start();
+            producer[i] = new Thread(new Producer(queue));
+            producer[i].start();
         }
 
         for (int i = 0; i < CONSUMER_COUNT; i++) {
-            consumers[i] = new Thread(new Consumer(queue));
-            consumers[i].start();
+            consumer[i] = new Thread(new Consumer(queue));
+            consumer[i].start();
         }
 
-        for (Thread producer : producers) {
+        for (Thread producers : producer) {
             try {
-                producer.join();
+                producers.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        for (Thread consumer : consumers) {
-            consumer.interrupt();
+        for (Thread consumers : consumer) {
+            consumers.interrupt();
         }
     }
 
